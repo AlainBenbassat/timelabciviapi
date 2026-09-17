@@ -1,0 +1,8 @@
+name: 'Timelab Civi API'
+type: module
+description: 'Custom REST endpoints for Timelab'
+package: Custom
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:rest
+  - drupal:serialization

@@ -1,0 +1,33 @@
+timelabciviapi.search_contact:
+  path: '/timelabcivi/individuals'
+  defaults:
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::searchIndividual'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+
+timelabciviapi.search_organization:
+  path: '/timelabcivi/organizations'
+  defaults:
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::searchOrganization'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+
+timelabciviapi.search_project:
+  path: '/timelabcivi/projects'
+  defaults:
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::searchProject'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+
+timelabciviapi.search_event:
+  path: '/timelabcivi/events'
+  defaults:
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::searchEvent'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+
+

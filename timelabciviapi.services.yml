@@ -1,0 +1,6 @@
+services:
+  timelabciviapi.repository.contact:
+    class: Drupal\timelabciviapi\Repository\ContactRepository
+
+  timelabciviapi.repository.event:
+    class: Drupal\timelabciviapi\Repository\EventRepository
