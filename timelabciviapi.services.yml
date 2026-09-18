@@ -4,3 +4,6 @@ services:
 
   timelabciviapi.repository.event:
     class: Drupal\timelabciviapi\Repository\EventRepository
+
+  timelabciviapi.repository.project:
+    class: Drupal\timelabciviapi\Repository\ProjectRepository

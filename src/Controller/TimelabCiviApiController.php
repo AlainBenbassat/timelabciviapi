@@ -8,15 +8,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\timelabciviapi\Repository\ContactRepository;
 use Drupal\timelabciviapi\Repository\EventRepository;
+use Drupal\timelabciviapi\Repository\ProjectRepository;
 use Drupal\Core\Site\Settings;
 
 class TimelabCiviApiController extends ControllerBase {
   protected ContactRepository $contactRepo;
   protected EventRepository $eventRepo;
+  protected ProjectRepository $projectRepo;
 
-  public function __construct(ContactRepository $contact_repo, EventRepository $event_repo) {
+  public function __construct(ContactRepository $contact_repo, EventRepository $event_repo, ProjectRepository $project_repo) {
     $this->contactRepo = $contact_repo;
     $this->eventRepo = $event_repo;
+    $this->projectRepo = $project_repo;
   }
 
   /**
@@ -30,12 +33,15 @@ class TimelabCiviApiController extends ControllerBase {
     /** @var \Drupal\timelabciviapi\Repository\EventRepository $eventRepo */
     $eventRepo = $container->get('timelabciviapi.repository.event');
 
-    return new static($contactRepo, $eventRepo);
+    /** @var \Drupal\timelabciviapi\Repository\ProjectRepository $projectRepo */
+    $projectRepo = $container->get('timelabciviapi.repository.project');
+
+    return new static($contactRepo, $eventRepo, $projectRepo);
   }
 
   public function searchIndividual(Request $request): JsonResponse {
-    if ($authResponse = $this->validateApiToken($request)) {
-      return $authResponse;
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
     }
 
     $email = $request->query->get('email');
@@ -54,22 +60,57 @@ class TimelabCiviApiController extends ControllerBase {
     ], 200);
   }
 
-  public function searchOrganization(Request $request): JsonResponse {
-    if ($authResponse = $this->validateApiToken($request)) {
-      return $authResponse;
+  public function getIndividual(Request $request, int $id): JsonResponse {
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
     }
 
-    /*
-     * NOG UIT TE WERKEN
-     */
-    $vat = $request->query->get('vat_number');
-    //$this->contactRepo->findOrgByVat($vat);
-    return new JsonResponse(['type' => 'organization', 'vat' => $vat]);
+    $contact = $this->contactRepo->findContactById($id);
+    if (empty($contact)) {
+      return $this->genericError(404, 'Contact not found');
+    }
+
+    return new JsonResponse([
+      'success' => TRUE,
+      'data' => $contact,
+    ], 200);
+  }
+
+  public function searchProject(Request $request): JsonResponse {
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
+    }
+
+    $projects = $this->projectRepo->findProjects();
+    if (empty($projects)) {
+      return $this->genericError(404, 'Projects not found');
+    }
+
+    return new JsonResponse([
+      'success' => TRUE,
+      'data' => $projects,
+    ], 200);
+  }
+
+  public function getProject(Request $request, int $id): JsonResponse {
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
+    }
+
+    $project = $this->projectRepo->findProjectById($id);
+    if (empty($project)) {
+      return $this->genericError(404, 'Project not found');
+    }
+
+    return new JsonResponse([
+      'success' => TRUE,
+      'data' => $project,
+    ], 200);
   }
 
   public function searchEvent(Request $request): JsonResponse {
-    if ($authResponse = $this->validateApiToken($request)) {
-      return $authResponse;
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
     }
 
     $title = $request->query->get('title', '');
@@ -95,39 +136,21 @@ class TimelabCiviApiController extends ControllerBase {
     ], 200);
   }
 
-  public function createParticipant(Request $request): JsonResponse {
-    if ($authResponse = $this->validateApiToken($request)) {
-      return $authResponse;
-    }
-
-    $params = $this->getRequestBody($request);
-
-    if (empty($params['contact_id'])) {
-      return $this->missingParameterError('contact_id');
-    }
-
-    if (empty($params['event_id'])) {
-      return $this->missingParameterError('event_id');
-    }
-
-    if (empty($params['note'])) {
-      return $this->missingParameterError('note');
-    }
-
-    $id = $this->eventRepo->createParticipant($params);
-
-    if (empty($id)) {
-      return $this->genericError(500, 'Failed to create participant.');
-    }
-
-    return new JsonResponse([
-      'success' => TRUE,
-      'data' => [
-        'participant_id' => $id,
-      ]
-    ], 201);
-  }
-
+  /**
+   * Validates the API token retrieved from the request headers.
+   *
+   * Verifies that the provided token matches the expected token
+   * configured in site settings.
+   *
+   * Returns a JSON response with an appropriate error message if the validation fails.
+   * Returns NULL if the token is valid.
+   *
+   * @param Request $request
+   *   The HTTP request object that contains headers, including the API token.
+   *
+   * @return JsonResponse|null
+   *   A JSON response with an error message if validation fails, or NULL if the token is valid.
+   */
   private function validateApiToken(Request $request): ?JsonResponse {
     $expectedToken = Settings::get('civiapi_api_token');
 

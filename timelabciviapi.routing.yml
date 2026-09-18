@@ -6,13 +6,14 @@ timelabciviapi.search_contact:
   requirements:
     _access: 'TRUE'
 
-timelabciviapi.search_organization:
-  path: '/timelabcivi/organizations'
+timelabciviapi.get_contact:
+  path: '/timelabcivi/individuals/{id}'
   defaults:
-    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::searchOrganization'
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::getIndividual'
   methods: [GET]
   requirements:
     _access: 'TRUE'
+    id: '\d+'
 
 timelabciviapi.search_project:
   path: '/timelabcivi/projects'
@@ -21,6 +22,15 @@ timelabciviapi.search_project:
   methods: [GET]
   requirements:
     _access: 'TRUE'
+
+timelabciviapi.get_project:
+  path: '/timelabcivi/projects/{id}'
+  defaults:
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::getProject'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+    id: '\d+'
 
 timelabciviapi.search_event:
   path: '/timelabcivi/events'
