@@ -3,8 +3,10 @@
 API for Timelab
 
 ## Endpoints
-
-- `/timelabciviapi/projects`: Retrieve project information
+* `/timelabciviapi/individuals?email=jos@test.com`
+* `/timelabciviapi/individuals/1234`
+* `/timelabciviapi/projects`
+* `/timelabciviapi/projects/1234`
 
 ## Technische info
 
