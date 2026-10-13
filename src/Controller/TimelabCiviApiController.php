@@ -39,6 +39,10 @@ class TimelabCiviApiController extends ControllerBase {
     return new static($contactRepo, $eventRepo, $projectRepo);
   }
 
+  /**************************************************************************************
+   * Individuals
+   */
+
   public function searchIndividual(Request $request): JsonResponse {
     if ($failedAuthResponse = $this->validateApiToken($request)) {
       return $failedAuthResponse;
@@ -76,6 +80,10 @@ class TimelabCiviApiController extends ControllerBase {
     ], 200);
   }
 
+  /**************************************************************************************
+   * Projects
+   */
+
   public function searchProject(Request $request): JsonResponse {
     if ($failedAuthResponse = $this->validateApiToken($request)) {
       return $failedAuthResponse;
@@ -99,7 +107,7 @@ class TimelabCiviApiController extends ControllerBase {
 
     $project = $this->projectRepo->findProjectById($id);
     if (empty($project)) {
-      return $this->genericError(404, 'Project not found');
+      return $this->genericError(404, "Project $id not found");
     }
 
     return new JsonResponse([
@@ -108,26 +116,37 @@ class TimelabCiviApiController extends ControllerBase {
     ], 200);
   }
 
+  /**************************************************************************************
+   * Events
+   */
+
   public function searchEvent(Request $request): JsonResponse {
     if ($failedAuthResponse = $this->validateApiToken($request)) {
       return $failedAuthResponse;
     }
 
-    $title = $request->query->get('title', '');
-    $keywords = $request->query->get('keywords', '');
+    $dateFrom = $request->query->get('dateFrom', '');
+    $dateTo = $request->query->get('dateTo', '');
 
-    if (empty($title) && empty($keywords)) {
-      return $this->missingParameterError('title or keywords');
-    }
-
-    $date = $request->query->get('date');
-    if (empty($date)) {
-      return $this->missingParameterError('date');
-    }
-
-    $event = $this->eventRepo->findEvent($title, $keywords, $date);
+    $events = $this->eventRepo->findEvent($dateFrom, $dateTo);
     if (empty($event)) {
-      return $this->genericError(404, 'Event not found');
+      return $this->genericError(404, 'Events not found');
+    }
+
+    return new JsonResponse([
+      'success' => TRUE,
+      'data' => $events,
+    ], 200);
+  }
+
+  public function getEvent(Request $request, int $id): JsonResponse {
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
+    }
+
+    $event = $this->eventRepo->findEventById($id);
+    if (empty($event)) {
+      return $this->genericError(404, "Event $id not found");
     }
 
     return new JsonResponse([

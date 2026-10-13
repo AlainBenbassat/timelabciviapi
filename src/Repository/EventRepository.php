@@ -7,55 +7,46 @@ class EventRepository {
     \Drupal::service('civicrm')->initialize();
   }
 
-  public function findEvent(string $title, string $keywords, string $date): ?array {
-    if ($title !== '') {
-      $keywordList = [$title];
+  public function findEvent(string $dateFrom, string $dateTo): ?array {
+    if (empty($dateFrom)) {
+      $dateFrom = date('Y-m-d 00:00:00');
     }
-    else {
-      $keywordList = explode(',', $keywords);
+    elseif (!$this->isValidDate($dateFrom)) {
+      return NULL;
     }
 
-    foreach ($keywordList as $keyword) {
-      $trimmedKeyword = trim($keyword);
-      if (empty($trimmedKeyword)) {
-        continue;
-      }
+    if (empty($dateTo)) {
+      $dateTo = '3000-12-31 23:59:59';
+    }
+    elseif (!$this->isValidDate($dateTo)) {
+      return NULL;
+    }
 
-      // regexp fails with API v4, so we use SQL
-      $startDate = "$date 00:00:00";
-      $endDate = "$date 23:59:59";
+    $events = [];
 
-      $sql = "
-        select
-          e.id,
-          e.start_date,
-          e.title
-        from
-          civicrm_event e
-        where
-          e.start_date >= %1
-        and
-          e.start_date <= %2
-        and
-          e.title regexp %3
-      ";
-      $sqlParams = [
-        1 => [$startDate, 'String'],
-        2 => [$endDate, 'String'],
-        3 => ['[[:<:]]' . $trimmedKeyword . '[[:>:]]', 'String'],
+    $eventsApi = \Civi\Api4\Event::get(FALSE)
+      ->addSelect('id', 'title', 'summary', 'description')
+      ->addWhere('is_template', '=', FALSE)
+      ->addWhere('is_public', '=', TRUE)
+      ->addWhere('start_date', '>=', $dateFrom)
+      ->addWhere('start_date', '<=', $dateTo)
+      ->execute();
+    foreach ($eventsApi as $event) {
+      $events[] = [
+        'event_id' => $event['id'],
+        'start_date' => $event['start_date'],
+        'title' => $event['title'],
+        'summary' => $event['summary'],
+        'description' => $event['description'],
       ];
-      $dao = \CRM_Core_DAO::executeQuery($sql, $sqlParams);
-
-      if ($dao->fetch()) {
-        return [
-          'id' => $dao->id,
-          'start_date' => $dao->start_date,
-          'title' => $dao->title
-        ];
-      }
     }
 
-    return NULL;
+    return $events;
+  }
+
+  private function isValidDate(string $date) {
+    $dt = DateTime::createFromFormat("Y-m-d", $date);
+    return $dt !== false && $dt::getLastErrors() === false;
   }
 
 }
