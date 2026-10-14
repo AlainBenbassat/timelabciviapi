@@ -129,7 +129,7 @@ class TimelabCiviApiController extends ControllerBase {
     $dateTo = $request->query->get('dateTo', '');
 
     $events = $this->eventRepo->findEvent($dateFrom, $dateTo);
-    if (empty($event)) {
+    if (empty($events)) {
       return $this->genericError(404, 'Events not found');
     }
 
@@ -153,6 +153,22 @@ class TimelabCiviApiController extends ControllerBase {
       'success' => TRUE,
       'data' => $event,
     ], 200);
+  }
+
+  /**************************************************************************************
+   * Participants
+   */
+
+  public function searchEventParticipants(Request $request): JsonResponse {
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
+    }
+
+    $eventId = $request->query->get('eventId');
+    if (empty($eventId)) {
+      return $this->missingParameterError('eventId');
+    }
+
   }
 
   /**

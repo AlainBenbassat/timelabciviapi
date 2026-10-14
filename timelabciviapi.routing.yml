@@ -48,3 +48,11 @@ timelabciviapi.get_event:
   requirements:
     _access: 'TRUE'
     id: '\d+'
+
+timelabciviapi.search_event_participants:
+  path: '/timelabcivi/participants'
+  defaults:
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::searchEventParticipants'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
