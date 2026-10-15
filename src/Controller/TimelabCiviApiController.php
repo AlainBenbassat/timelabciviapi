@@ -81,7 +81,7 @@ class TimelabCiviApiController extends ControllerBase {
   }
 
   /**************************************************************************************
-   * Projects
+   * Projects and Streams
    */
 
   public function searchProject(Request $request): JsonResponse {
@@ -113,6 +113,22 @@ class TimelabCiviApiController extends ControllerBase {
     return new JsonResponse([
       'success' => TRUE,
       'data' => $project,
+    ], 200);
+  }
+
+  public function searchStream(Request $request): JsonResponse {
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
+    }
+
+    $streams = $this->projectRepo->findStreams();
+    if (empty($streams)) {
+      return $this->genericError(404, 'Streams not found');
+    }
+
+    return new JsonResponse([
+      'success' => TRUE,
+      'data' => $streams,
     ], 200);
   }
 
@@ -168,6 +184,16 @@ class TimelabCiviApiController extends ControllerBase {
     if (empty($eventId)) {
       return $this->missingParameterError('eventId');
     }
+
+    $participants = $this->eventRepo->findEventParticipants($eventId);
+    if (empty($participants)) {
+      return $this->genericError(404, 'Participants not found');
+    }
+
+    return new JsonResponse([
+      'success' => TRUE,
+      'data' => $participants,
+    ], 200);
 
   }
 

@@ -27,11 +27,11 @@ class EventRepository {
     $events = [];
 
     $eventsApi = \Civi\Api4\Event::get(FALSE)
-      ->addSelect('id', 'title', 'summary', 'description', 'start_date', 'end_date', 'Img.Project')
+      ->addSelect('id', 'title', 'summary', 'description', 'start_date', 'end_date', 'is_public', 'Img.Project')
       ->addWhere('is_template', '=', FALSE)
-      ->addWhere('is_public', '=', TRUE)
       ->addWhere('start_date', '>=', $dateFrom)
       ->addWhere('start_date', '<=', $dateTo)
+      ->addOrderBy('start_date', 'ASC')
       ->execute();
     foreach ($eventsApi as $event) {
       $events[] = [
@@ -39,6 +39,7 @@ class EventRepository {
         'start_date' => $event['start_date'],
         'end_date' => $event['end_date'],
         'title' => $event['title'],
+        'is_public' => $event['is_public'],
         'summary' => $event['summary'] ?: $event['description'],
         'project_id' => $event['Img.Project'],
         'prices' => $this->getEventPrices($event['id']),
@@ -50,9 +51,8 @@ class EventRepository {
 
   public function findEventById(int $id): ?array {
     $eventsApi = \Civi\Api4\Event::get(FALSE)
-      ->addSelect('id', 'title', 'summary', 'description', 'start_date', 'end_date', 'Img.Project')
+      ->addSelect('id', 'title', 'summary', 'description', 'start_date', 'end_date', 'is_public', 'Img.Project')
       ->addWhere('is_template', '=', FALSE)
-      ->addWhere('is_public', '=', TRUE)
       ->addWhere('id', '=', $id)
       ->execute()
       ->first();
@@ -66,6 +66,7 @@ class EventRepository {
       'start_date' => $eventsApi['start_date'],
       'end_date' => $eventsApi['end_date'],
       'title' => $eventsApi['title'],
+      'is_public' => $eventsApi['is_public'],
       'summary' => $eventsApi['summary'] ?: $eventsApi['description'],
       'project_id' => $eventsApi['Img.Project'],
       'prices' => $this->getEventPrices($eventsApi['id']),

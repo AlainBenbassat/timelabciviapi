@@ -32,6 +32,14 @@ timelabciviapi.get_project:
     _access: 'TRUE'
     id: '\d+'
 
+timelabciviapi.search_stream:
+  path: '/timelabcivi/streams'
+  defaults:
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::searchStream'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+
 timelabciviapi.search_event:
   path: '/timelabcivi/events'
   defaults:
