@@ -80,6 +80,7 @@ class EventRepository {
       ->addSelect('contact_id')
       ->addWhere('event_id', '=', $eventId)
       ->addWhere('status_id', '=', 1)
+      ->addWhere('contact_id.is_deleted', '=', FALSE)
       ->execute();
     foreach ($participantApi as $participant) {
       $participants[] = $participant['contact_id'];
