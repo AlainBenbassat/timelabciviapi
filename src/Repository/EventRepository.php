@@ -29,8 +29,8 @@ class EventRepository {
     $eventsApi = \Civi\Api4\Event::get(FALSE)
       ->addSelect('id', 'title', 'summary', 'description', 'start_date', 'end_date', 'is_public', 'Img.Project')
       ->addWhere('is_template', '=', FALSE)
-      ->addWhere('start_date', '>=', $dateFrom)
       ->addWhere('start_date', '<=', $dateTo)
+      ->addWhere('end_date', '>=', $dateFrom)
       ->addOrderBy('start_date', 'ASC')
       ->execute();
     foreach ($eventsApi as $event) {
