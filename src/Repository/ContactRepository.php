@@ -107,21 +107,29 @@ class ContactRepository {
     return $contact;
   }
 
-  public function update(array $contact): void {
+  public function update(int $id, array $contact): void {
     $updatableContactFields = ['role', 'bio', 'linkedin', 'instagram'];
-    $fieldsToUpdate = [];
+    $contactFieldsToUpdate = [];
 
-    foreach ($updatableContactFields as $field) {
-      if (isset($contact[$field])) {
-        $fieldsToUpdate[$field] = trim($contact[$field]);
-      }
+    if (isset($contact['role'])) {
+      $contactFieldsToUpdate['public.Role'] = trim($contact['role']);
+    }
+    if (isset($contact['bio'])) {
+      $contactFieldsToUpdate['public.BIO'] = trim($contact['bio']);
     }
 
-    if ($fieldsToUpdate) {
+    if ($contactFieldsToUpdate) {
       \Civi\Api4\Contact::update(FALSE)
-        ->addWhere('id', '=', $contact['id'])
-        ->setValues($fieldsToUpdate)
+        ->addWhere('id', '=', $id)
+        ->setValues($contactFieldsToUpdate)
         ->execute();
+    }
+
+    if (isset($contact['linkedin'])) {
+      $this->updateContactUrl($id, 9, $contact['linkedin']);
+    }
+    if (isset($contact['instagram'])) {
+      $this->updateContactUrl($id, 8, $contact['instagram']);
     }
   }
 
@@ -155,4 +163,36 @@ class ContactRepository {
   private function getPhone(int $contactId): string {
     return \CRM_Core_DAO::singleValueQuery("select ifnull(phone, '') from civicrm_phone where contact_id = $contactId and is_primary = 1");
   }
+
+  private function updateContactUrl(int $contactId, int $websiteTypeId, string $url): void {
+    // delete
+    if (empty($url)) {
+      \CRM_Core_DAO::executeQuery("delete from civicrm_website where contact_id = $contactId and website_type_id = $websiteTypeId");
+      return;
+    }
+
+    // add or update?
+    $website = \Civi\Api4\Website::get(FALSE)
+      ->addWhere('contact_id', '=', $contactId)
+      ->addWhere('website_type_id', '=', $websiteTypeId)
+      ->execute()
+      ->first();
+
+    if (empty($website)) {
+      // add
+      \Civi\Api4\Website::create(FALSE)
+        ->addValue('contact_id', $contactId)
+        ->addValue('url', $url)
+        ->addValue('website_type_id', $websiteTypeId)
+        ->execute();
+    }
+    else {
+      // update
+      \Civi\Api4\Website::update(FALSE)
+        ->addValue('url', $url)
+        ->addWhere('id', '=', $website['id'])
+        ->execute();
+    }
+  }
+
 }

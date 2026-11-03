@@ -27,7 +27,7 @@ class EventRepository {
     $events = [];
 
     $eventsApi = \Civi\Api4\Event::get(FALSE)
-      ->addSelect('id', 'title', 'summary', 'description', 'start_date', 'end_date', 'is_public', 'Img.Project')
+      ->addSelect('id', 'event_type_id', 'title', 'summary', 'description', 'start_date', 'end_date', 'is_public', 'Img.Project')
       ->addWhere('is_template', '=', FALSE)
       ->addWhere('start_date', '<=', $dateTo)
       ->addWhere('end_date', '>=', $dateFrom)
@@ -36,6 +36,7 @@ class EventRepository {
     foreach ($eventsApi as $event) {
       $events[] = [
         'event_id' => $event['id'],
+        'event_type_id' => $event['event_type_id'],
         'start_date' => $event['start_date'],
         'end_date' => $event['end_date'],
         'title' => $event['title'],
@@ -51,7 +52,7 @@ class EventRepository {
 
   public function findEventById(int $id): ?array {
     $eventsApi = \Civi\Api4\Event::get(FALSE)
-      ->addSelect('id', 'title', 'summary', 'description', 'start_date', 'end_date', 'is_public', 'Img.Project')
+      ->addSelect('id', 'event_type_id', 'title', 'summary', 'description', 'start_date', 'end_date', 'is_public', 'Img.Project')
       ->addWhere('is_template', '=', FALSE)
       ->addWhere('id', '=', $id)
       ->execute()
@@ -63,6 +64,7 @@ class EventRepository {
 
     return [
       'event_id' => $eventsApi['id'],
+      'event_type_id' => $eventsApi['event_type_id'],
       'start_date' => $eventsApi['start_date'],
       'end_date' => $eventsApi['end_date'],
       'title' => $eventsApi['title'],

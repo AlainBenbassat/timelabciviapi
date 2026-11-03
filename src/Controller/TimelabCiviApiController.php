@@ -85,12 +85,18 @@ class TimelabCiviApiController extends ControllerBase {
       return $failedAuthResponse;
     }
 
+    // make sure the contact exists
+    $contact = $this->contactRepo->findContactById($id);
+    if (empty($contact)) {
+      return $this->genericError(404, 'Contact not found');
+    }
+
     $contact = json_decode($request->getContent(), TRUE);
     if (!is_array($contact) || empty($contact)) {
       return $this->genericError(400, 'Contact not found in the body');
     }
 
-    $this->contactRepo->update($contact);
+    $this->contactRepo->update($id, $contact);
 
     return new JsonResponse([
       'success' => TRUE,
