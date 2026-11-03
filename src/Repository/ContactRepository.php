@@ -47,6 +47,8 @@ class ContactRepository {
       'linkedin' => $this->getLinkedin($emailApi['contact_id']),
       'instagram' => $this->getInstagram($emailApi['contact_id']),
       'member_since' => $this->getMemberSince($emailApi['contact_id']),
+      'role' => $emailApi['contact_id.public.Role'],
+      'bio' => $emailApi['contact_id.public.Bio'],
       'gdpr' => [
         'show_on_site' => $emailApi['contact_id.GDPR.May_be_shown_on_site_'],
         'visible_data' => $emailApi['contact_id.GDPR.What_is_publicly_visible_'],
@@ -92,6 +94,8 @@ class ContactRepository {
       'linkedin' => $this->getLinkedin($contactApi['id']),
       'instagram' => $this->getInstagram($contactApi['id']),
       'member_since' => $this->getMemberSince($contactApi['id']),
+      'role' => $contactApi['public.Role'],
+      'bio' => $contactApi['public.BIO'],
       'gdpr' => [
         'show_on_site' => $contactApi['GDPR.May_be_shown_on_site_'],
         'visible_data' => $contactApi['GDPR.What_is_publicly_visible_'],
