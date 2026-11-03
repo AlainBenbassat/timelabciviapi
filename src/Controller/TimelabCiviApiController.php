@@ -197,6 +197,27 @@ class TimelabCiviApiController extends ControllerBase {
 
   }
 
+  /**************************************************************************************
+   * Orders
+   */
+  public function createOrder(Request $request): JsonResponse {
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
+    }
+
+    $order = json_decode($request->getContent(), TRUE);
+    if (!is_array($order) || empty($order)) {
+      return $this->genericError(400, 'Order not found in the body');
+    }
+
+    $this->orderRepo->create($order);
+
+    return new JsonResponse([
+      'success' => TRUE,
+      'data' => 'Order created',
+    ], 200);
+  }
+
   /**
    * Validates the API token retrieved from the request headers.
    *
@@ -229,10 +250,6 @@ class TimelabCiviApiController extends ControllerBase {
     }
 
     return NULL;
-  }
-
-  private function getRequestBody(Request $request): ?array {
-    return json_decode($request->getContent(), TRUE);
   }
 
   private function genericError(int $errorNumber, string $errorDescription): JsonResponse {

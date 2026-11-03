@@ -64,3 +64,12 @@ timelabciviapi.search_event_participants:
   methods: [GET]
   requirements:
     _access: 'TRUE'
+
+
+timelabciviapi.create_order:
+  path: '/timelabcivi/orders'
+  defaults:
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::createOrder'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
