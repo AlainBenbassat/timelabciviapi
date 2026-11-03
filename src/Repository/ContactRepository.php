@@ -46,7 +46,7 @@ class ContactRepository {
       'telephone' => \CRM_Core_DAO::singleValueQuery("select ifnull(phone, '') from civicrm_phone where contact_id = {$emailApi['contact_id']} and is_primary = 1"),
       'linkedin' => $this->getLinkedin($emailApi['contact_id']),
       'instagram' => $this->getInstagram($emailApi['contact_id']),
-      'member_since' => \CRM_Core_DAO::singleValueQuery('select min(member_since) from civicrm_membership where contact_id = ' . $emailApi['contact_id']),
+      'member_since' => \CRM_Core_DAO::singleValueQuery('select min(join_date) from civicrm_membership where contact_id = ' . $emailApi['contact_id']),
       'gdpr' => [
         'show_on_site' => $emailApi['contact_id.GDPR.May_be_shown_on_site_'],
         'visible_data' => $emailApi['contact_id.GDPR.What_is_publicly_visible_'],
@@ -91,7 +91,7 @@ class ContactRepository {
       'telephone' => $contactApi['phone_primary.phone'],
       'linkedin' => $this->getLinkedin($contactApi['id']),
       'instagram' => $this->getInstagram($contactApi['id']),
-      'member_since' => \CRM_Core_DAO::singleValueQuery('select min(member_since) from civicrm_membership where contact_id = ' . $contactApi['id']),
+      'member_since' => \CRM_Core_DAO::singleValueQuery('select min(join_date) from civicrm_membership where contact_id = ' . $contactApi['id']),
       'gdpr' => [
         'show_on_site' => $contactApi['GDPR.May_be_shown_on_site_'],
         'visible_data' => $contactApi['GDPR.What_is_publicly_visible_'],
