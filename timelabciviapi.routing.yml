@@ -15,6 +15,15 @@ timelabciviapi.get_contact:
     _access: 'TRUE'
     id: '\d+'
 
+timelabciviapi.update_contact:
+  path: '/timelabcivi/individuals/{id}'
+  defaults:
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::updateIndividual'
+  methods: [PATCH]
+  requirements:
+    _access: 'TRUE'
+    id: '\d+'
+
 timelabciviapi.search_project:
   path: '/timelabcivi/projects'
   defaults:

@@ -43,10 +43,10 @@ class ContactRepository {
       'last_name' => $emailApi['contact_id.last_name'],
       'picture' => $emailApi['contact_id.image_URL'],
       'email' => $email,
-      'telephone' => \CRM_Core_DAO::singleValueQuery("select ifnull(phone, '') from civicrm_phone where contact_id = {$emailApi['contact_id']} and is_primary = 1"),
+      'telephone' => $this->getPhone($emailApi['contact_id']),
       'linkedin' => $this->getLinkedin($emailApi['contact_id']),
       'instagram' => $this->getInstagram($emailApi['contact_id']),
-      'member_since' => \CRM_Core_DAO::singleValueQuery('select min(join_date) from civicrm_membership where contact_id = ' . $emailApi['contact_id']),
+      'member_since' => $this->getMemberSince($emailApi['contact_id']),
       'gdpr' => [
         'show_on_site' => $emailApi['contact_id.GDPR.May_be_shown_on_site_'],
         'visible_data' => $emailApi['contact_id.GDPR.What_is_publicly_visible_'],
@@ -91,7 +91,7 @@ class ContactRepository {
       'telephone' => $contactApi['phone_primary.phone'],
       'linkedin' => $this->getLinkedin($contactApi['id']),
       'instagram' => $this->getInstagram($contactApi['id']),
-      'member_since' => \CRM_Core_DAO::singleValueQuery('select min(join_date) from civicrm_membership where contact_id = ' . $contactApi['id']),
+      'member_since' => $this->getMemberSince($contactApi['id']),
       'gdpr' => [
         'show_on_site' => $contactApi['GDPR.May_be_shown_on_site_'],
         'visible_data' => $contactApi['GDPR.What_is_publicly_visible_'],
@@ -101,6 +101,24 @@ class ContactRepository {
     ];
 
     return $contact;
+  }
+
+  public function update(array $contact): void {
+    $updatableContactFields = ['role', 'bio', 'linkedin', 'instagram'];
+    $fieldsToUpdate = [];
+
+    foreach ($updatableContactFields as $field) {
+      if (isset($contact[$field])) {
+        $fieldsToUpdate[$field] = trim($contact[$field]);
+      }
+    }
+
+    if ($fieldsToUpdate) {
+      \Civi\Api4\Contact::update(FALSE)
+        ->addWhere('id', '=', $contact['id'])
+        ->setValues($fieldsToUpdate)
+        ->execute();
+    }
   }
 
   private function getLinkedIn(int $contactId): string {
@@ -124,5 +142,13 @@ class ContactRepository {
     }
 
     return $website['url'];
+  }
+
+  private function getMemberSince(int $contactId): string {
+    return \CRM_Core_DAO::singleValueQuery("select ifnull(min(join_date), '') from civicrm_membership where contact_id = $contactId");
+  }
+
+  private function getPhone(int $contactId): string {
+    return \CRM_Core_DAO::singleValueQuery("select ifnull(phone, '') from civicrm_phone where contact_id = $contactId and is_primary = 1");
   }
 }

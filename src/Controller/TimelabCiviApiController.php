@@ -80,6 +80,24 @@ class TimelabCiviApiController extends ControllerBase {
     ], 200);
   }
 
+  public function updateIndividual(Request $request, int $id): JsonResponse {
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
+    }
+
+    $contact = json_decode($request->getContent(), TRUE);
+    if (!is_array($contact) || empty($contact)) {
+      return $this->genericError(400, 'Contact not found in the body');
+    }
+
+    $this->contactRepo->update($contact);
+
+    return new JsonResponse([
+      'success' => TRUE,
+      'data' => 'Contact updated',
+    ], 200);
+  }
+
   /**************************************************************************************
    * Projects and Streams
    */
