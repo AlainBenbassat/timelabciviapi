@@ -101,7 +101,7 @@ class ContactRepository {
         'visible_data' => $contactApi['GDPR.What_is_publicly_visible_'],
         'contexts' => $contactApi['GDPR.Where_is_it_shown_'],
         'visible_name' => $contactApi['GDPR.Display_name_as']
-      ]
+      ],
     ];
 
     return $contact;
@@ -116,6 +116,15 @@ class ContactRepository {
     }
     if (isset($contact['bio'])) {
       $contactFieldsToUpdate['public.BIO'] = trim($contact['bio']);
+    }
+    if (isset($contact['gdpr']['visible_data'])) {
+      $contactFieldsToUpdate['GDPR.What_is_publicly_visible_'] = $contact['gdpr']['visible_data'];
+    }
+    if (isset($contact['gdpr']['contexts'])) {
+      $contactFieldsToUpdate['GDPR.Where_is_it_shown_'] = $contact['gdpr']['contexts'];
+    }
+    if (isset($contact['gdpr']['visible_name'])) {
+      $contactFieldsToUpdate['GDPR.Display_name_as'] = $contact['gdpr']['visible_name'];
     }
 
     if ($contactFieldsToUpdate) {
