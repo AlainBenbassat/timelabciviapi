@@ -117,6 +117,9 @@ class ContactRepository {
     if (isset($contact['bio'])) {
       $contactFieldsToUpdate['public.BIO'] = trim($contact['bio']);
     }
+    if (isset($contact['gdpr']['show_on_site'])) {
+      $contactFieldsToUpdate['GDPR.May_be_shown_on_site_'] = $contact['gdpr']['show_on_site'];
+    }
     if (isset($contact['gdpr']['visible_data'])) {
       $contactFieldsToUpdate['GDPR.What_is_publicly_visible_'] = $contact['gdpr']['visible_data'];
     }
