@@ -108,7 +108,7 @@ class ContactRepository {
   }
 
   public function update(int $id, array $contact): void {
-    $updatableContactFields = ['role', 'bio', 'linkedin', 'instagram'];
+    // updatable fields: role, bio, linkedin, instagram
     $contactFieldsToUpdate = [];
 
     if (isset($contact['role'])) {

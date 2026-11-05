@@ -34,7 +34,7 @@ class ProjectRepository {
 
   private function projectQuery(): \Civi\Api4\Generic\DAOGetAction {
     return \Civi\Api4\Contact::get(FALSE)
-      ->addSelect('id', 'display_name', 'label_projects.Labels_projects')
+      ->addSelect('id', 'display_name', 'label_projects.Labels_projects', 'Project_details.Start_Date', 'Project_details.End_Date')
       ->addWhere('contact_sub_type', '=', 'Project_timelab');
   }
 
@@ -43,8 +43,8 @@ class ProjectRepository {
       'id' => $project['id'],
       'name' => $project['display_name'],
       'stream' => $project['label_projects.Labels_projects'],
-      'start_date' => '2000-01-01',
-      'end_date' => '3000-01-01',
+      'start_date' => $project['Project_details.Start_Date'],
+      'end_date' => $project['Project_details.End_Date'],
     ];
   }
 
