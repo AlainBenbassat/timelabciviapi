@@ -7,3 +7,6 @@ services:
 
   timelabciviapi.repository.project:
     class: Drupal\timelabciviapi\Repository\ProjectRepository
+
+  timelabciviapi.repository.group:
+    class: Drupal\timelabciviapi\Repository\GroupRepository
