@@ -2,6 +2,7 @@
 
 namespace Drupal\timelabciviapi\Repository;
 
+use CRM_Core_DAO;
 use CRM_Utils_Rule;
 
 class ContactRepository {
@@ -53,8 +54,8 @@ class ContactRepository {
         'show_on_site' => $emailApi['contact_id.GDPR.May_be_shown_on_site_'],
         'visible_data' => $emailApi['contact_id.GDPR.What_is_publicly_visible_'],
         'contexts' => $emailApi['contact_id.GDPR.Where_is_it_shown_'],
-        'visible_name' => $emailApi['contact_id.GDPR.Display_name_as']
-      ]
+        'visible_name' => $emailApi['contact_id.GDPR.Display_name_as'],
+      ],
     ];
 
     return $contact;
@@ -100,7 +101,7 @@ class ContactRepository {
         'show_on_site' => $contactApi['GDPR.May_be_shown_on_site_'],
         'visible_data' => $contactApi['GDPR.What_is_publicly_visible_'],
         'contexts' => $contactApi['GDPR.Where_is_it_shown_'],
-        'visible_name' => $contactApi['GDPR.Display_name_as']
+        'visible_name' => $contactApi['GDPR.Display_name_as'],
       ],
     ];
 
@@ -143,6 +144,59 @@ class ContactRepository {
     if (isset($contact['instagram'])) {
       $this->updateContactUrl($id, 8, $contact['instagram']);
     }
+  }
+
+  public function findPartners(): array {
+    $dao = CRM_Core_DAO::executeQuery($this->getPartnersSQL());
+    return $dao->fetchAll(\PDO::FETCH_ASSOC);
+  }
+
+  private function getPartnersSQL(): string {
+    return "
+      select
+        prtnr.id,
+        prtnr.display_name partner,
+        w.url website,
+        prtnr.image_URL picture
+      from
+        civicrm_contact proj
+      inner join
+        civicrm_relationship r on r.relationship_type_id = 20 and r.contact_id_a = proj.id and r.is_active = 1
+      inner join
+        civicrm_contact prtnr on prtnr.id = r.contact_id_b
+      left outer join
+        civicrm_website w on w.contact_id = prtnr.id and w.website_type_id = 6
+      where
+        proj.contact_type = 'Organization'
+      and
+        proj.contact_sub_type like '%Project_timelab%'
+      and
+        proj.is_deleted = 0
+      and
+        prtnr.is_deleted = 0
+      union
+      select
+        prtnr.id,
+        prtnr.display_name,
+        w.url,
+        prtnr.image_URL
+      from
+        civicrm_contact proj
+      inner join
+        civicrm_relationship r on r.relationship_type_id = 20 and r.contact_id_b = proj.id and r.is_active = 1
+      inner join
+        civicrm_contact prtnr on prtnr.id = r.contact_id_a
+      left outer join
+        civicrm_website w on w.contact_id = prtnr.id and w.website_type_id = 6
+      where
+        proj.contact_type = 'Organization'
+      and
+        proj.contact_sub_type like '%Project_timelab%'
+      and
+        proj.is_deleted = 0
+      and
+        prtnr.is_deleted = 0
+    ";
   }
 
   private function getLinkedIn(int $contactId): string {

@@ -105,6 +105,26 @@ class TimelabCiviApiController extends ControllerBase {
   }
 
   /**************************************************************************************
+   * Partners
+   */
+
+  public function searchPartner(Request $request): JsonResponse {
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
+    }
+
+    $partners = $this->contactRepo->findPartners();
+    if (empty($partners)) {
+      return $this->genericError(404, 'Partners not found');
+    }
+
+    return new JsonResponse([
+      'success' => TRUE,
+      'data' => $partners,
+    ], 200);
+  }
+
+  /**************************************************************************************
    * Projects and Streams
    */
 

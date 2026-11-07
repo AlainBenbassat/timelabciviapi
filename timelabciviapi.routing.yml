@@ -24,6 +24,14 @@ timelabciviapi.update_contact:
     _access: 'TRUE'
     id: '\d+'
 
+timelabciviapi.search_partner:
+  path: '/timelabcivi/partners'
+  defaults:
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::searchPartner'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+
 timelabciviapi.search_project:
   path: '/timelabcivi/projects'
   defaults:
