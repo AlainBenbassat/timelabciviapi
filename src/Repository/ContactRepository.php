@@ -151,7 +151,17 @@ class ContactRepository {
     return $dao->fetchAll(\PDO::FETCH_ASSOC);
   }
 
-  private function getPartnersSQL(): string {
+  public function findActivePartners(): array {
+    $dao = CRM_Core_DAO::executeQuery($this->getPartnersSQL(TRUE));
+    return $dao->fetchAll(\PDO::FETCH_ASSOC);
+  }
+
+  private function getPartnersSQL(bool $activeOnly = FALSE): string {
+    $isActiveProject = '';
+    if ($activeOnly) {
+      $isActiveProject = " and ifnull(pd.start_date_136, '1900-01-01') <= NOW() and ifnull(pd.end_date_137, '3000-01-01') >= NOW() ";
+    }
+
     return "
       select
         prtnr.id,
@@ -166,6 +176,8 @@ class ContactRepository {
         civicrm_contact prtnr on prtnr.id = r.contact_id_b
       left outer join
         civicrm_website w on w.contact_id = prtnr.id and w.website_type_id = 6
+      left outer join
+        civicrm_value_project_detai_62 pd on pd.entity_id = proj.id
       where
         proj.contact_type = 'Organization'
       and
@@ -174,6 +186,7 @@ class ContactRepository {
         proj.is_deleted = 0
       and
         prtnr.is_deleted = 0
+      $isActiveProject
       union
       select
         prtnr.id,
@@ -188,6 +201,8 @@ class ContactRepository {
         civicrm_contact prtnr on prtnr.id = r.contact_id_a
       left outer join
         civicrm_website w on w.contact_id = prtnr.id and w.website_type_id = 6
+      left outer join
+        civicrm_value_project_detai_62 pd on pd.entity_id = proj.id
       where
         proj.contact_type = 'Organization'
       and
@@ -196,6 +211,7 @@ class ContactRepository {
         proj.is_deleted = 0
       and
         prtnr.is_deleted = 0
+      $isActiveProject
     ";
   }
 

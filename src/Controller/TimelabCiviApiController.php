@@ -9,17 +9,20 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\timelabciviapi\Repository\ContactRepository;
 use Drupal\timelabciviapi\Repository\EventRepository;
 use Drupal\timelabciviapi\Repository\ProjectRepository;
+use Drupal\timelabciviapi\Repository\GroupRepository;
 use Drupal\Core\Site\Settings;
 
 class TimelabCiviApiController extends ControllerBase {
   protected ContactRepository $contactRepo;
   protected EventRepository $eventRepo;
   protected ProjectRepository $projectRepo;
+  protected GroupRepository $groupRepo;
 
-  public function __construct(ContactRepository $contact_repo, EventRepository $event_repo, ProjectRepository $project_repo) {
+  public function __construct(ContactRepository $contact_repo, EventRepository $event_repo, ProjectRepository $project_repo, GroupRepository $groupRepo) {
     $this->contactRepo = $contact_repo;
     $this->eventRepo = $event_repo;
     $this->projectRepo = $project_repo;
+    $this->groupRepo = $groupRepo;
   }
 
   /**
@@ -36,7 +39,10 @@ class TimelabCiviApiController extends ControllerBase {
     /** @var \Drupal\timelabciviapi\Repository\ProjectRepository $projectRepo */
     $projectRepo = $container->get('timelabciviapi.repository.project');
 
-    return new static($contactRepo, $eventRepo, $projectRepo);
+    /** @var \Drupal\timelabciviapi\Repository\GroupRepository $groupRepo */
+    $groupRepo = $container->get('timelabciviapi.repository.group');
+
+    return new static($contactRepo, $eventRepo, $projectRepo, $groupRepo);
   }
 
   /**************************************************************************************
@@ -121,6 +127,26 @@ class TimelabCiviApiController extends ControllerBase {
     return new JsonResponse([
       'success' => TRUE,
       'data' => $partners,
+    ], 200);
+  }
+
+  /**************************************************************************************
+   * Groups
+   */
+
+  public function searchGroup(Request $request): JsonResponse {
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
+    }
+
+    $groups = $this->groupRepo->findGroups();
+    if (empty($groups)) {
+      return $this->genericError(404, 'Groups not found');
+    }
+
+    return new JsonResponse([
+      'success' => TRUE,
+      'data' => $groups,
     ], 200);
   }
 

@@ -32,6 +32,14 @@ timelabciviapi.search_partner:
   requirements:
     _access: 'TRUE'
 
+timelabciviapi.search_groups:
+  path: '/timelabcivi/groups'
+  defaults:
+    _controller: '\Drupal\timelabciviapi\Controller\TimelabCiviApiController::searchGroup'
+  methods: [GET]
+  requirements:
+    _access: 'TRUE'
+
 timelabciviapi.search_project:
   path: '/timelabcivi/projects'
   defaults:
