@@ -225,7 +225,7 @@ class TimelabCiviApiController extends ControllerBase {
     ], 200);
   }
 
-  public function searchEventTypes(Request $request): JsonResponse {
+  public function searchEventType(Request $request): JsonResponse {
     if ($failedAuthResponse = $this->validateApiToken($request)) {
       return $failedAuthResponse;
     }
