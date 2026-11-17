@@ -151,9 +151,9 @@ class EventRepository {
 
     foreach ($optionValues as $optionValue) {
       $eventTypes[] = [
-        'id' => $optionValue->value,
-        'title' => $optionValue->label,
-        'is_active' => $optionValue->is_active,
+        'id' => $optionValue['value'],
+        'title' => $optionValue['label'],
+        'is_active' => $optionValue['is_active'],
       ];
     }
 
