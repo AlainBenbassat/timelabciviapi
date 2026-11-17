@@ -225,6 +225,22 @@ class TimelabCiviApiController extends ControllerBase {
     ], 200);
   }
 
+  public function searchEventTypes(Request $request): JsonResponse {
+    if ($failedAuthResponse = $this->validateApiToken($request)) {
+      return $failedAuthResponse;
+    }
+
+    $eventTypes = $this->eventRepo->findEventTypes();
+    if (empty($eventTypes)) {
+      return $this->genericError(404, 'Event types not found');
+    }
+
+    return new JsonResponse([
+      'success' => TRUE,
+      'data' => $eventTypes,
+    ], 200);
+  }
+
   public function getEvent(Request $request, int $id): JsonResponse {
     if ($failedAuthResponse = $this->validateApiToken($request)) {
       return $failedAuthResponse;

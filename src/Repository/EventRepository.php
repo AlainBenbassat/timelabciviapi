@@ -141,4 +141,23 @@ class EventRepository {
     return $prices;
   }
 
+  public function findEventTypes(): array {
+    $eventTypes = [];
+
+    $optionValues = \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('value', 'label', 'is_active')
+      ->addWhere('option_group_id', '=', 14)
+      ->execute();
+
+    foreach ($optionValues as $optionValue) {
+      $eventTypes[] = [
+        'id' => $optionValue->value,
+        'title' => $optionValue->label,
+        'is_active' => $optionValue->is_active,
+      ];
+    }
+
+    return $eventTypes;
+  }
+
 }
