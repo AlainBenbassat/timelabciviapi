@@ -42,7 +42,7 @@ class ContactRepository {
       'contact_id' => $emailApi['contact_id'],
       'first_name' => $emailApi['contact_id.first_name'],
       'last_name' => $emailApi['contact_id.last_name'],
-      'picture' => $emailApi['contact_id.image_URL'],
+      'picture' => $this->correctImagePath($emailApi['contact_id.image_URL']),
       'email' => $email,
       'telephone' => $this->getPhone($emailApi['contact_id']),
       'linkedin' => $this->getLinkedin($emailApi['contact_id']),
@@ -89,7 +89,7 @@ class ContactRepository {
       'contact_id' => $contactApi['id'],
       'first_name' => $contactApi['first_name'],
       'last_name' => $contactApi['last_name'],
-      'picture' => $contactApi['image_URL'],
+      'picture' => $this->correctImagePath($contactApi['image_URL']),
       'email' => $contactApi['email_primary.email'],
       'telephone' => $contactApi['phone_primary.phone'],
       'linkedin' => $this->getLinkedin($contactApi['id']),
@@ -275,6 +275,13 @@ class ContactRepository {
         ->addWhere('id', '=', $website['id'])
         ->execute();
     }
+  }
+
+  private function correctImagePath($url) {
+    // some (old) pictures have a wrong url
+    $url = str_replace('http://', 'https://', $url);
+    $url = str_replace('//timelab.org', '//crm.timelab.org', $url);
+    return $url;
   }
 
 }
