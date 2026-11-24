@@ -239,11 +239,21 @@ class ContactRepository {
   }
 
   private function getMemberSince(int $contactId): string {
-    return \CRM_Core_DAO::singleValueQuery("select ifnull(min(join_date), '') from civicrm_membership where contact_id = $contactId");
+    $v = \CRM_Core_DAO::singleValueQuery("select ifnull(min(join_date), '') from civicrm_membership where contact_id = $contactId");
+    if (empty($v)) {
+      return '';
+    }
+
+    return $v;
   }
 
   private function getPhone(int $contactId): string {
-    return \CRM_Core_DAO::singleValueQuery("select ifnull(phone, '') from civicrm_phone where contact_id = $contactId and is_primary = 1");
+    $v = \CRM_Core_DAO::singleValueQuery("select ifnull(phone, '') from civicrm_phone where contact_id = $contactId and is_primary = 1");
+    if (empty($v)) {
+      return '';
+    }
+
+    return $v;
   }
 
   private function updateContactUrl(int $contactId, int $websiteTypeId, string $url): void {
