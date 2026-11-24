@@ -281,6 +281,7 @@ class ContactRepository {
     // some (old) pictures have a wrong url
     $url = str_replace('http://', 'https://', $url);
     $url = str_replace('//timelab.org', '//crm.timelab.org', $url);
+    $url = str_replace('//www.timelab.org', '//crm.timelab.org', $url);
     return $url;
   }
 
