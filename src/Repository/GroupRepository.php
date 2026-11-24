@@ -100,13 +100,14 @@ class GroupRepository {
     $members = [];
 
     // Type contact individual, ID, foto, naam, voornaam - selectie relationship is team van tot actief project (actief project is einddatum niet verstreken)
+    // Exclude timelab employees (timelab = id 2402)
     $sql = "
       select
         distinct member.id
       from
         civicrm_contact proj
       inner join
-        civicrm_relationship r on r.contact_id_b = proj.id and r.relationship_type_id = 4 and r.is_active = 1
+        civicrm_relationship r on r.contact_id_b = proj.id and r.relationship_type_id = {self::REL_IS_TEAM_LID_VAN} and r.is_active = 1
       inner join
         civicrm_contact member on member.id = r.contact_id_a
       left outer join
@@ -123,6 +124,8 @@ class GroupRepository {
         member.contact_type = 'Individual'
       and
         member.is_deleted = 0
+      and
+        member.id not in (select tlab.contact_id_a from civicrm_relationship tlab where tlab.contact_id_a = member.id and tlab.contact_id_b = 2402)
     ";
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
