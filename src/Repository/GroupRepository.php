@@ -107,7 +107,7 @@ class GroupRepository {
       from
         civicrm_contact proj
       inner join
-        civicrm_relationship r on r.contact_id_b = proj.id and r.relationship_type_id = {self::REL_IS_TEAM_LID_VAN} and r.is_active = 1
+        civicrm_relationship r on r.contact_id_b = proj.id and r.relationship_type_id = " . self::REL_IS_TEAM_LID_VAN . " and r.is_active = 1
       inner join
         civicrm_contact member on member.id = r.contact_id_a
       left outer join
